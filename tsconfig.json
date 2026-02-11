@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "CommonJS",
+    "module": "Node16", // 使用 Node.js 16 的模块系统，可以用于支持 ES 模块
+    "moduleResolution": "node16", // 意思是 TypeScript 将按照 Node.js 16 的模块解析规则来解析模块
     "outDir": "dist",
     "rootDir": "src",
     "strict": true,
@@ -9,5 +10,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src"]
+  "include": [
+    "src"
+  ]
 }

@@ -1,42 +1,39 @@
-﻿import { Annotation, StateGraph, START, END } from "@langchain/langgraph";
+﻿import { MessagesAnnotation, StateGraph, START, END } from "@langchain/langgraph";
+import { ToolNode, toolsCondition } from "@langchain/langgraph/prebuilt";
 import { ChatDeepSeek } from "@langchain/deepseek";
+import { TavilySearch } from "@langchain/tavily";
+import dotenv from "dotenv";
 
-type AgentMessage = { role: "user" | "ai"; content: string };
-
-const AgentState = Annotation.Root({
-  messages: Annotation<AgentMessage[]>({
-    reducer: (current, update) => current.concat(update),
-    default: () => [],
-  }),
-});
-
-const graph = new StateGraph(AgentState, {
-  nodes: ["respond-test"] as const,
-});
+dotenv.config();
 
 const model = new ChatDeepSeek({
   model: "deepseek-chat",
   apiKey: process.env.DEEPSEEK_API_KEY,
 });
 
-graph.addNode("respond-test", async (state: typeof AgentState.State) => {
-
-  const response = await model.invoke([
-    { role: "system", content: "你是一个简洁、友好的 AI 助手。" },
-    ...state.messages
-  ]);
-
-  return {
-    messages: [
-      {
-        role: "ai",
-        content: response.content.toString(),
-      },
-    ],
-  };
+const TavilySearchTool = new TavilySearch({
+  tavilyApiKey: process.env.TAVILY_API_KEY,
+  maxResults: 2,
+  topic: "general",
 });
+const tools = [TavilySearchTool];
 
-graph.addEdge(START, "respond-test");
-graph.addEdge("respond-test", END);
+const modelWithTools = model.bindTools(tools);
+const toolNode = new ToolNode(tools);
+
+const callModel = async (state: typeof MessagesAnnotation.State) => {
+  const response = await modelWithTools.invoke([
+    { role: "system", content: "你是一个简洁、友好的 AI 助手。" },
+    ...state.messages,
+  ]);
+  return { messages: [response] };
+};
+
+const graph = new StateGraph(MessagesAnnotation)
+  .addNode("agent", callModel)
+  .addNode("tools", toolNode)
+  .addEdge(START, "agent")
+  .addConditionalEdges("agent", toolsCondition, ["tools", END])
+  .addEdge("tools", "agent");
 
 export const agentGraph = graph.compile();
