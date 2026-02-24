@@ -1,12 +1,16 @@
-import { MessagesAnnotation, StateGraph, START, END } from "@langchain/langgraph";
+import { StateGraph, START, END } from "@langchain/langgraph";
 import { toolsCondition } from "@langchain/langgraph/prebuilt";
-import { callModel } from "./callModel";
-import { toolNode } from "./toolNode";
+import { callModel } from "./nodes/callModel";
+import { toolNode } from "./nodes/toolNode";
+import { extractPdf } from "./nodes/extractPdf";
+import { AgentState } from "./state";
 
-const graph = new StateGraph(MessagesAnnotation)
+const graph = new StateGraph(AgentState)
+  .addNode("extractPdf", extractPdf)
   .addNode("agent", callModel)
   .addNode("tools", toolNode)
-  .addEdge(START, "agent")
+  .addEdge(START, "extractPdf")
+  .addEdge("extractPdf", "agent")
   .addConditionalEdges("agent", toolsCondition, ["tools", END])
   .addEdge("tools", "agent");
 
