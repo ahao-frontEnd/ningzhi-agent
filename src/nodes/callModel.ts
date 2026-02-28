@@ -6,7 +6,6 @@ import { AgentState } from "../state";
 const modelWithTools = model.bindTools(tools);
 
 export const callModel = async (state: typeof AgentState.State) => {
-  console.log('state.pdfTexts  ', state.pdfTexts)
   const response = await modelWithTools.invoke([
     { role: "system", content: buildSystemPrompt(state.pdfTexts) },
     ...state.messages,
