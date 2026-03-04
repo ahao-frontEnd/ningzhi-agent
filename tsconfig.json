@@ -1,15 +1,16 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
+    "target": "ES2022", // 将 TypeScript 编译为 ES2022 版本的 JavaScript，这样可以使用 ES2022 中引入的新特性
     "module": "Node16", // 使用 Node.js 16 的模块系统，可以用于支持 ES 模块
     "moduleResolution": "node16", // 意思是 TypeScript 将按照 Node.js 16 的模块解析规则来解析模块
-    "outDir": "dist",
-    "rootDir": "src",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "outDir": "dist", // 编译后的 JavaScript 文件将输出到 dist 目录
+    "rootDir": "src", // TypeScript 源代码的根目录是 src，这样编译器知道从哪里开始编译
+    "strict": true, // 启用所有严格类型检查选项，这样可以帮助你捕获潜在的错误并提高代码质量
+    "esModuleInterop": true, // 允许默认导入非 ES 模块，这样你就可以使用 import 语法来导入 CommonJS 模块
+    "skipLibCheck": true, // 跳过库文件的类型检查，这样可以加快编译速度，尤其是当你使用大量第三方库时
+    "forceConsistentCasingInFileNames": true // 强制文件名的大小写一致，这样可以避免在不同操作系统上出现文件名大小写不一致的问题
   },
+  // 指定要包含在编译中的文件或目录，这里我们指定了 src 目录，这样 TypeScript 就会编译 src 目录下的所有 TypeScript 文件
   "include": [
     "src"
   ]

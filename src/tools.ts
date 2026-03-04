@@ -36,10 +36,32 @@ export const getResumeTemplateTool = new DynamicTool({
   func: async () => RESUME_TEMPLATE,
 });
 
+const BEHAVIOURAL_QUESTIONS_URL =
+  "https://raw.githubusercontent.com/mianshipai/mianshipai-web/refs/heads/main/docs/hr-exam/behavioural-test.md";
+
+export const getBehaviouralQuestionsTool = new DynamicTool({
+  name: "getBehaviouralQuestions",
+  description:
+    "用于模拟面试时获取 HR 行为面试的问题和答案，返回 markdown 文本。",
+  func: async () => {
+    const response = await fetch(BEHAVIOURAL_QUESTIONS_URL);
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch behavioural questions: ${response.status} ${response.statusText}`,
+      );
+    }
+    return await response.text();
+  },
+});
+
 const tavilySearchTool = new TavilySearch({
   tavilyApiKey: config.tavilyApiKey,
   maxResults: 2,
   topic: "general",
 });
 
-export const tools = [getResumeTemplateTool, tavilySearchTool];
+export const tools = [
+  getResumeTemplateTool,
+  getBehaviouralQuestionsTool,
+  tavilySearchTool,
+];
